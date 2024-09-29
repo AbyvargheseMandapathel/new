@@ -1,0 +1,97 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}HireWave - Create Job Alert{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<div class="page-title-container">
+    <div class="row">
+        <div class="col-12 col-md-7">
+            <h1 class="mb-0 pb-0 display-4" id="title">Create Job Alerts</h1>
+            <nav class="breadcrumb-container d-inline-block" aria-label="breadcrumb">
+                <ul class="breadcrumb pt-0">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<section class="scroll-section" id="floatingLabel">
+    <h2 class="small-title">Create Job Alert</h2>
+    <div class="card mb-5">
+        <div class="card-body">
+            <form id="validationFloatingLabel" method="POST" enctype="multipart/form-data" class="tooltip-end-top">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Company Name" required />
+                    <label for="company_name">Company Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Title" required />
+                    <label for="title">Title</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" id="job_description" name="job_description" placeholder="Job Description" rows="3" required></textarea>
+                    <label for="job_description">Job Description</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="original_link" name="original_link" placeholder="Original Link" required />
+                    <label for="original_link">Original Link</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="file" class="form-control" id="image" name="image" />
+                    <label for="image">Image</label>
+                </div>
+                <button class="btn btn-primary" type="submit">Create Job Alert</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Include CKEditor JS from CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/38.0.0/classic/ckeditor.js"></script>
+<script>
+    // Initialize CKEditor
+    ClassicEditor
+        .create(document.querySelector('#job_description'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
+<!-- Custom CSS for CKEditor to match existing styles -->
+<style>
+    /* Match the styles with your existing form */
+    .ck-editor__editable {
+        min-height: 200px; /* Adjust height as needed */
+        border: 1px solid #ced4da; /* Same border as your form controls */
+        border-radius: 0.25rem; /* Match border-radius */
+        padding: 0.375rem; /* Match padding of form controls */
+        font-family: Arial, sans-serif; /* Change to your font */
+        font-size: 1rem; /* Match font size */
+        color: #495057; /* Match text color */
+    }
+
+    .ck-editor__editable[contenteditable="true"]:focus {
+        border-color: #80bdff; /* Match focus border color */
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus shadow */
+        outline: 0; /* Remove default outline */
+    }
+
+    /* Optional: Style the toolbar */
+    .ck-toolbar {
+        border: 1px solid #ced4da; /* Same border as your form controls */
+        border-radius: 0.25rem; /* Match border-radius */
+        margin-bottom: 10px; /* Space between toolbar and editor */
+    }
+
+    .ck-toolbar__items {
+        display: flex; /* Align toolbar items properly */
+    }
+
+    /* Add more styles as necessary */
+</style>
+
+{% endblock %}

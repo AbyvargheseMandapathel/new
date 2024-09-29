@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Data Test</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Modal Data Test</h2>
+
+        <!-- Test Button to trigger the modal -->
+        <button class="btn btn-primary" id="testButton" 
+                data-id="123" 
+                data-name="Sample Name">
+            Open Modal with Data
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="testModalLabel">Modal Test</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalContent"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const testButton = document.getElementById('testButton');
+            const modal = new bootstrap.Modal(document.getElementById('testModal'));
+            const modalContent = document.getElementById('modalContent');
+
+            // Add click event listener on the button
+            testButton.addEventListener('click', function() {
+                // Retrieve data from button attributes
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                // Log values to the console
+                console.log('ID:', id);
+                console.log('Name:', name);
+
+                // Display the data inside the modal content
+                modalContent.innerHTML = `ID: ${id} <br> Name: ${name}`;
+
+                // Show the modal
+                modal.show();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% extends 'accounts/auth_base.html' %}
+{% block title %}HireWave | Login{% endblock %} 
+{% block content %}
+          <!-- Right Side Start -->
+          <div class="col-12 col-lg-auto h-100 pb-4 px-4 pt-0 p-lg-0">
+            <div class="sw-lg-70 min-h-100 bg-foreground d-flex justify-content-center align-items-center shadow-deep py-5 full-page-content-right-border">
+              <div class="sw-lg-50 px-5">
+                <div class="sh-11">
+                  <a href="">
+                    <div class="logo-default"></div>
+                  </a>
+                </div>
+                <div class="mb-5">
+                  <h2 class="cta-1 mb-0 text-primary">Welcome,</h2>
+                  <h2 class="cta-1 text-primary">let's get started!</h2>
+                </div>
+                <div class="mb-5">
+                  <p class="h6">Please use your credentials to login.</p>
+                  <p class="h6">
+                    If you are not a member, please
+                    <a href="{% url 'accounts:signup' %}">register</a>
+                    .
+                  </p>
+                </div>
+                {% if messages %}
+    <div id="alert-container" class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if 'success' in message.tags %}success{% else %}danger{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+                
+                  <form id="loginForm" class="tooltip-end-bottom" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3 filled form-group tooltip-end-top">
+                      <i data-acorn-icon="login"></i>
+                      <input class="form-control" placeholder="Username" name="username" />
+                    </div>
+                    <div class="mb-3 filled form-group tooltip-end-top">
+                      <i data-acorn-icon="lock-off"></i>
+                      <input class="form-control pe-7" name="password" type="password" placeholder="Password" />
+                      <a class="text-small position-absolute t-3 e-3" href="{% url 'accounts:password_reset_request' %}">Forgot?</a>
+                    </div>
+                    <input type="submit" class="btn btn-lg btn-primary"/>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Right Side End -->
+    {% endblock %}

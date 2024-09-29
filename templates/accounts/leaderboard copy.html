@@ -1,0 +1,37 @@
+<h2>Referral Leaderboard</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Referrer</th>
+            <th>Referral Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in leaderboard %}
+        <tr>
+            <td>{{ entry.referrer.username }}</td>
+            <td>{{ entry.count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h3>Your Referral Link</h3>
+<div>
+    <input type="text" id="referralLink" value="{{ logged_in_user_referral_link }}" readonly>
+    <button onclick="copyReferralLink()">Copy Referral Link</button>
+</div>
+
+<button onclick="shareReferralLink()">Share</button>
+
+<script>
+function copyReferralLink() {
+    /* Get the referral link input field */
+    var referralLink = document.getElementById("referralLink");
+
+    /* Select the referral link text */
+    referralLink.select();
+    referralLink.setSelectionRange(0, 

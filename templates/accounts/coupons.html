@@ -1,0 +1,247 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}HireWave - Coupons{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Coupons Management</h1>
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addCouponModal">Add Coupon</button>
+
+    <!-- Alert for Success/Failure -->
+    {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Coupons List -->
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Usage</th>
+                    <th>Expires At</th>
+                    <th>Number of Days</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in page_obj %}
+                <tr>
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.created_at|date:"d.m.Y" }} - {{ coupon.expires_at|date:"d.m.Y" }}</td>
+                    <td>{{ coupon.limit }}</td>
+                    <td>{{ coupon.expires_at|date:"d.m.Y" }}</td>
+                    <td>{{ coupon.days }}</td>
+                    <td>
+                        {% if coupon.is_valid %}
+                            <span class="text-success">&#10003;</span> <!-- Check mark for valid -->
+                        {% else %}
+                            <span class="text-danger">Expired</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editCouponModal"
+                            data-id="{{ coupon.id }}" 
+                            data-code="{{ coupon.code }}" 
+                            data-limit="{{ coupon.limit }}" 
+                            data-expires_at="{{ coupon.expires_at|date:'Y-m-d' }}" 
+                            data-gives_free_premium="{{ coupon.gives_free_premium }}" 
+                            data-days="{{ coupon.days }}">
+                            Edit
+                        </button>
+
+                        <button class="btn btn-danger btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteCouponModal" 
+                                data-id="{{ coupon.id }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active" aria-current="page"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Add Coupon Modal -->
+    <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCouponForm" method="post" action="{% url 'accounts:add_coupon' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="code" class="form-label">Code</label>
+                            <input type="text" class="form-control" id="code" name="code" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="limit" class="form-label">Usage Limit</label>
+                            <input type="number" class="form-control" id="limit" name="limit" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expires_at" class="form-label">Expires At</label>
+                            <input type="date" class="form-control" id="expires_at" name="expires_at" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="gives_free_premium" name="gives_free_premium">
+                            <label class="form-check-label" for="gives_free_premium">Gives Free Premium</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="days" class="form-label">Number of Premium Days</label>
+                            <input type="number" class="form-control" id="days" name="days" min="0" value="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Coupon</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Coupon Modal -->
+    <div class="modal fade" id="editCouponModal" tabindex="-1" aria-labelledby="editCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCouponModalLabel">Edit Coupon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCouponForm" method="post" action="{% url 'accounts:edit_coupon' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="edit_coupon_id" name="id">
+                        <div class="mb-3">
+                            <label for="edit_code" class="form-label">Code</label>
+                            <input type="text" class="form-control" id="edit_code" name="code" required readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_limit" class="form-label">Usage Limit</label>
+                            <input type="number" class="form-control" id="edit_limit" name="limit" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_expires_at" class="form-label">Expires At</label>
+                            <input type="date" class="form-control" id="edit_expires_at" name="expires_at" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit_gives_free_premium" name="gives_free_premium">
+                            <label class="form-check-label" for="edit_gives_free_premium">Gives Free Premium</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_days" class="form-label">Number of Premium Days</label>
+                            <input type="number" class="form-control" id="edit_days" name="days" min="0" value="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Coupon Modal -->
+    <div class="modal fade" id="deleteCouponModal" tabindex="-1" aria-labelledby="deleteCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCouponModalLabel">Delete Coupon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this coupon?</p>
+                    <form id="deleteCouponForm" method="post" action="{% url 'accounts:delete_coupon' %}">
+                        {% csrf_token %}
+                        <input type="hidden" id="delete_coupon_id" name="id">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script to populate edit form -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var editCouponModal = document.getElementById('editCouponModal');
+    editCouponModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var couponId = button.getAttribute('data-id');
+        var code = button.getAttribute('data-code');
+        var limit = button.getAttribute('data-limit');
+        var expiresAt = button.getAttribute('data-expires_at');
+        var givesFreePremium = button.getAttribute('data-gives_free_premium') === 'True';
+        var days = button.getAttribute('data-days');
+
+        var modal = editCouponModal.querySelector('form');
+        modal.querySelector('#edit_coupon_id').value = couponId;
+        modal.querySelector('#edit_code').value = code;
+        modal.querySelector('#edit_limit').value = limit;
+        modal.querySelector('#edit_expires_at').value = expiresAt;
+        modal.querySelector('#edit_gives_free_premium').checked = givesFreePremium;
+        modal.querySelector('#edit_days').value = days;
+    });
+
+    var deleteCouponModal = document.getElementById('deleteCouponModal');
+    deleteCouponModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var couponId = button.getAttribute('data-id');
+
+        var modal = deleteCouponModal.querySelector('form');
+        modal.querySelector('#delete_coupon_id').value = couponId;
+    });
+});
+</script>
+
+{% endblock %}

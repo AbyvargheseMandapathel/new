@@ -1,0 +1,81 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>User List</h1>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Date Joined</th>
+                <th>Premium Status</th>
+                <th>Email Verified</th>
+                <th>Referred By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.date_joined }}</td>
+                <td>
+                    {% if user.is_premium %}
+                        <span class="text-success">&#10004;</span> <!-- Green tick -->
+                    {% else %}
+                        <span class="text-danger">&#10008;</span> <!-- Red cross -->
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_email_verified %}
+                        <span class="text-success">&#10004;</span> <!-- Green tick -->
+                    {% else %}
+                        <span class="text-danger">&#10008;</span> <!-- Red cross -->
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.referred_by %}
+                        {{ user.referred_by.username }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

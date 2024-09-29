@@ -1,0 +1,130 @@
+{% extends 'accounts/base.html' %} {% block title %}HireWave | Job Alert
+Detail{% endblock %} {% load static %} {% block content %}
+<div class="container">
+  <!-- Title Start -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-container">
+        <h1 class="mb-0 pb-0 display-4" id="title">{{ job_alert.title }}</h1>
+        <nav
+          class="breadcrumb-container d-inline-block"
+          aria-label="breadcrumb"
+        >
+          <ul class="breadcrumb pt-0">
+            <li class="breadcrumb-item"><a href="">Home</a></li>
+            <li class="breadcrumb-item"><a href="">Job Alerts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+              {{ job_alert.title }}
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <!-- Title End -->
+
+  <div class="row">
+    <div class="col-12 col-xl-12 col-xxl-12 mb-5">
+      <div class="card mb-5">
+        <!-- Content Start -->
+        <div class="card-body p-0">
+          <div class="glide glide-gallery" id="glideJobAlertDetail">
+            <div class="glide glide-large">
+              <div class="glide__track" data-glide-el="track">
+                <ul class="glide__slides gallery-glide-custom">
+                  {% if job_alert.image %}
+                  <li class="glide__slide p-0">
+                    <a href="{{ job_alert.image.url }}">
+                      <img
+                        alt="Job Image"
+                        src="{{ job_alert.image.url }}"
+                        class="responsive border-0 rounded-top-end rounded-top-start img-fluid mb-3 sh-50 w-100"
+                      />
+                    </a>
+                  </li>
+                  {% else %}
+                  <img
+                  alt="Job Image"
+                  src="https://i.imgur.com/TxT6z9Y.jpeg"
+                  class="responsive border-0 rounded-top-end rounded-top-start img-fluid mb-3 sh-50 w-100"
+                />
+              </a>
+            </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+            <div class="glide glide-thumb mb-3">
+              <div class="glide__track" data-glide-el="track">
+                <ul class="glide__slides">
+                  {% for thumb in thumbs %}
+                  <li class="glide__slide p-0">
+                    <img
+                      alt="thumb"
+                      src="{% static thumb %}"
+                      class="responsive rounded-md img-fluid"
+                    />
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <div class="card-body pt-0">
+                <h4 class="mb-3">{{ job_alert.title }}</h4>
+                <div>
+                  <p>{{ job_alert.job_description|safe }}</p>
+                  <p>{{ job_alert.company_name }}</p>
+                  <div>
+                    {% if is_premium %}
+                    <a
+                      href="{{ job_alert.original_link }}"
+                      class="btn btn-primary btn-lg mb-1"
+                      target="_blank"
+                      >Apply Now</a
+                    >
+                    {% else %}
+                    <a
+                      href="{{ job_alert.short_link }}"
+                     class="btn btn-primary btn-lg mb-1"
+                      target="_blank"
+                      >Apply Now</a
+                    >
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Content End -->
+            <div class="card-footer border-0 pt-0">
+                <div class="row align-items-center">
+                  <!-- Comments and Likes Start -->
+                  <div class="col-6 text-muted">
+                    <div class="row g-0">
+                      <div class="col-auto pe-3">
+                        <i data-acorn-icon="eye" class="text-primary me-1" data-acorn-size="15"></i>
+                        <span class="align-middle">{{ job_alert.views }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Comments and Likes End -->
+
+                  <!-- Social Buttons Start -->
+                  <div class="col-6">
+                    <div class="d-flex align-items-center justify-content-end">
+                      <button class="btn btn-sm btn-icon btn-icon-only btn-outline-primary ms-1" type="button">
+                        <i data-acorn-icon="facebook"></i>
+                      </button>
+                      <button class="btn btn-sm btn-icon btn-icon-only btn-outline-primary ms-1" type="button">
+                        <i data-acorn-icon="twitter"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Social Buttons End -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+        {% endblock %}

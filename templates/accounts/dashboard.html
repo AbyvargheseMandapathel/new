@@ -1,0 +1,87 @@
+{% extends 'accounts/base.html' %}
+{% block title %}HireWave | Dashboard{% endblock %}
+{% load static %}
+{% block content %}
+{% if messages %}
+    <div id="alert-container" class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if 'success' in message.tags %}success{% else %}danger{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="container">
+  <!-- Title and Top Buttons Start -->
+  <div class="page-title-container">
+    <div class="row">
+      <!-- Title Start -->
+      <div class="col-12 col-md-7">
+        <h1 class="mb-0 pb-0 display-4" id="title">Latest Job/Internship Updates</h1>
+        <nav class="breadcrumb-container d-inline-block" aria-label="breadcrumb">
+          <ul class="breadcrumb pt-0">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          </ul>
+        </nav>
+      </div>
+      <!-- Title End -->
+    </div>
+  </div>
+  <!-- Title and Top Buttons End -->
+</div>
+<!-- Job Alerts Section Start -->
+<h2 class="small-title">Latest Job Alerts</h2>
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-2 mb-5">
+  {% for job in job_alerts %}
+  <div class="col">
+    <div class="card h-100">
+      <img src="{% if job.image %}{{ job.image.url }}{% else %}{% static 'img/course/small/course-5.webp' %}{% endif %}" class="card-img-top sh-22" alt="job image" />
+      <div class="card-body">
+        <h5 class="heading mb-0">
+          <a href="{% url 'accounts:job_description' job.pk %}" class="body-link">{{ job.title }}</a>
+        </h5>
+        <p class="mb-0">{{ job.company_name }}</p>
+      </div>
+      <div class="card-footer border-0 pt-0">
+        <div class="text-muted text-overline text-small">Views: {{ job.views }}</div>
+        <div class="text-muted text-small">Posted on: {{ job.created_at|date:"F j, Y" }}</div>
+        <!-- View More Button -->
+        <a href="{% url 'accounts:job_description' job.pk %}" class="btn btn-primary btn-sm mt-2">View More</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination Section Start -->
+<section class="scroll-section" id="alignment">
+      <nav aria-label="Page navigation example" class="mb-5">
+        <ul class="pagination justify-content-center">
+          {% if job_alerts.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ job_alerts.previous_page_number }}" aria-label="Previous">
+              <i data-acorn-icon="chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+
+          {% for num in job_alerts.paginator.page_range %}
+            {% if job_alerts.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > job_alerts.number|add:-3 and num < job_alerts.number|add:3 %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+
+          {% if job_alerts.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ job_alerts.next_page_number }}" aria-label="Next">
+              <i data-acorn-icon="chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+</section>
+<!-- Pagination Section End -->
+{% endblock %}

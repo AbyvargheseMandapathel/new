@@ -1,0 +1,35 @@
+<!-- templates/admin_dashboard.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <section>
+        <h2>Today's Unique Visitors</h2>
+        <p>{{ unique_visitors_today }}</p>
+    </section>
+
+    <section>
+        <h2>Daily Unique Visitors for the Last 7 Days</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Unique Visitors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for date in days_range %}
+                <tr>
+                    <td>{{ date }}</td>
+                    <td>{{ daily_stats.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>

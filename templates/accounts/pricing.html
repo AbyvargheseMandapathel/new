@@ -1,0 +1,124 @@
+{% extends 'accounts/base.html' %}
+{% block title %}HireWave | Pricing{% endblock %}
+{% load static %}
+{% block content %}
+<!-- Plans Start -->
+<h2 class="small-title">Choose a Plan</h2>
+<div class="mb-5">
+  <div class="row row-cols-1 row-cols-lg-3 g-2">
+    <!-- Plan 1: 7 Days -->
+    <div class="col">
+      <div class="card h-100 hover-scale-up">
+        <div class="card-body pb-0">
+          <div class="d-flex flex-column align-items-center mb-4">
+            <div class="bg-gradient-light sw-6 sh-6 rounded-xl d-flex justify-content-center align-items-center mb-2">
+              <i class="text-white" data-acorn-icon="calendar"></i>
+            </div>
+            <div class="cta-4 text-primary mb-1">Basic</div>
+            <div class="text-muted sh-3 line-through">Rs 30.00</div>
+            <div class="display-4">Rs 15.00</div>
+            <div class="text-small text-muted mb-1">7 Days</div>
+          </div>
+          <p class="text-alternate mb-4">
+            Perfect for a short-term boost. Enjoy access to all features for 7 days.
+          </p>
+        </div>
+        <div class="card-footer pt-0 border-0">
+          <div class="d-flex justify-content-center">
+            <a href="https://wa.me/7306255503?text=I%20would%20like%20to%20purchase%20Basic%20Plan" class="btn btn-icon btn-icon-start btn-foreground hover-outline stretched-link">
+              <i data-acorn-icon="chevron-right"></i>
+              <span>Purchase</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Plan 2: 14 Days -->
+    <div class="col">
+      <div class="card h-100 hover-scale-up">
+        <div class="card-body pb-0">
+          <div class="d-flex flex-column align-items-center mb-4">
+            <div class="bg-gradient-light sw-6 sh-6 rounded-xl d-flex justify-content-center align-items-center mb-2">
+              <i class="text-white" data-acorn-icon="calendar"></i>
+            </div>
+            <div class="cta-4 text-primary mb-1">Standard</div>
+            <div class="text-muted sh-3 line-through">Rs 40.00</div>
+            <div class="display-4">Rs 20.00</div>
+            <div class="text-small text-muted mb-1">14 Days</div>
+          </div>
+          <p class="text-alternate mb-4">
+            Ideal for a mid-term subscription. Get full access for 14 days.
+          </p>
+        </div>
+        <div class="card-footer pt-0 border-0">
+          <div class="d-flex justify-content-center">
+            <a href="https://wa.me/7306255503?text=I%20would%20like%20to%20purchase%20Standard%20Plan" class="btn btn-icon btn-icon-start btn-foreground hover-outline stretched-link">
+              <i data-acorn-icon="chevron-right"></i>
+              <span>Purchase</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Plan 3: 30 Days -->
+    <div class="col">
+      <div class="card h-100 hover-scale-up">
+        <div class="card-body pb-0">
+          <div class="d-flex flex-column align-items-center mb-4">
+            <div class="bg-gradient-light sw-6 sh-6 rounded-xl d-flex justify-content-center align-items-center mb-2">
+              <i class="text-white" data-acorn-icon="calendar"></i>
+            </div>
+            <div class="cta-4 text-primary mb-1">Premium</div>
+            <div class="text-muted sh-3 line-through">Rs 80.00</div>
+            <div class="display-4">Rs 30.00</div>
+            <div class="text-small text-muted mb-1">30 Days</div>
+          </div>
+          <p class="text-alternate mb-4">
+            Best value for long-term use. Enjoy access to all features for a whole month.
+          </p>
+        </div>
+        <div class="card-footer pt-0 border-0">
+          <div class="d-flex justify-content-center">
+            <a href="https://wa.me/7306255503?text=I%20would%20like%20to%20purchase%20Premium%20Plan" class="btn btn-icon btn-icon-start btn-foreground hover-outline stretched-link">
+              <i data-acorn-icon="chevron-right"></i>
+              <span>Purchase</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Plans End -->
+
+<!-- Coupon Section Start -->
+<div class="text-center mt-5">
+  <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#couponModal">
+    Have a Coupon?
+  </a>
+</div>
+
+<!-- Coupon Modal -->
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="couponModalLabel">Enter Your Coupon Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{% url 'accounts:apply_coupon' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="couponCode" class="form-label">Coupon Code</label>
+            <input type="text" class="form-control" id="couponCode" name="coupon_code" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Apply Coupon</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Coupon Section End -->
+
+{% endblock %}

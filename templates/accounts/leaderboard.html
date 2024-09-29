@@ -1,0 +1,111 @@
+{% extends 'accounts/base.html' %}
+{% block title %}HireWave | Leaderboard Detail{% endblock %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <!-- Title and Top Buttons Start -->
+    <div class="page-title-container">
+        <div class="row">
+            <!-- Title Start -->
+            <div class="col-12 col-md-7">
+                <h1 class="mb-0 pb-0 display-4" id="title">Referral Leaderboard</h1>
+                <nav class="breadcrumb-container d-inline-block" aria-label="breadcrumb">
+                    <ul class="breadcrumb pt-0">
+                        <li class="breadcrumb-item"><a href="">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Leaderboard</li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- Title End -->
+        </div>
+    </div>
+    <!-- Title and Top Buttons End -->
+
+    <!-- Content Start -->
+    <div class="data-table-rows slim">
+        <!-- Table Start -->
+        <div class="data-table-responsive-wrapper">
+            <table id="leaderboardTable" class="data-table nowrap w-100">
+                <thead>
+                    <tr>
+                        <th class="text-muted text-small text-uppercase">Rank</th>
+                        <th class="text-muted text-small text-uppercase">Referrer</th>
+                        <th class="text-muted text-small text-uppercase">Referrals</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in leaderboard %}
+                    <tr>
+                        <td>{{ entry.rank }}</td>
+                        <td>{{ entry.referrer.username }}</td>
+                        <td>{{ entry.count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No referrals yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Table End -->
+    </div>
+    <!-- Content End -->
+
+<!-- Referral Link Section -->
+<div class="referral-link-container mt-4 p-4 bg-dark text-white border rounded">
+    <h2 class="mb-3">Your Referral Link</h2>
+    <p class="mb-3">
+        Share your referral link to invite friends to join our platform and let them experience the many benefits we offer. By joining, they will enjoy:
+    </p>
+    <ul class="mb-3">
+        <li>📢 <strong>10+ daily job and internship updates</strong></li>
+        <li>🔗 <strong>Exclusive referral links for better opportunities</strong></li>
+        <li>🎓 <strong>Free courses to enhance your skills</strong></li>
+        <li>💡 <strong>Proven interview tips & preparation</strong></li>
+        <li>❓ <strong>Common interview questions to ace your next interview</strong></li>
+    </ul>
+    <p class="mb-3">
+        Your referral link:
+    </p>
+    <div class="d-flex mb-3">
+        <input type="text" class="form-control me-2" value="{{ logged_in_user_referral_link }}" readonly id="referralLinkInput" style="cursor: not-allowed; color: black;">
+        <button class="btn btn-outline-primary" type="button" onclick="copyToClipboard()">
+            <i class="bi bi-clipboard"></i> Copy
+        </button>
+    </div>
+    <div class="mt-3">
+        <h5>Share on Social Media</h5>
+        <div class="d-flex">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ logged_in_user_referral_link }}&quote=Join%20us%20for%20these%20benefits:%20%0A📢%2010%2B%20daily%20job%20and%20internship%20updates%0A🔗%20Exclusive%20referral%20links%20for%20better%20opportunities%0A🎓%20Free%20courses%20to%20enhance%20your%20skills%0A💡%20Proven%20interview%20tips%20%26%20preparation%0A❓%20Common%20interview%20questions%20to%20ace%20your%20next%20interview" target="_blank" class="btn btn-outline-primary me-2 text-white">
+                <i class="bi bi-facebook"></i> Facebook
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ logged_in_user_referral_link }}&text=Join%20us%20for%20these%20benefits:%20%0A📢%2010%2B%20daily%20job%20and%20internship%20updates%0A🔗%20Exclusive%20referral%20links%20for%20better%20opportunities%0A🎓%20Free%20courses%20to%20enhance%20your%20skills%0A💡%20Proven%20interview%20tips%20%26%20preparation%0A❓%20Common%20interview%20questions%20to%20ace%20your%20next%20interview" target="_blank" class="btn btn-outline-primary me-2 text-white">
+                <i class="bi bi-twitter"></i> Twitter
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ logged_in_user_referral_link }}&title=Join%20us%20for%20these%20benefits&summary=📢%2010%2B%20daily%20job%20and%20internship%20updates%0A🔗%20Exclusive%20referral%20links%20for%20better%20opportunities%0A🎓%20Free%20courses%20to%20enhance%20your%20skills%0A💡%20Proven%20interview%20tips%20%26%20preparation%0A❓%20Common%20interview%20questions%20to%20ace%20your%20next%20interview" target="_blank" class="btn btn-outline-primary me-2 text-white">
+                <i class="bi bi-linkedin"></i> LinkedIn
+            </a>
+            <a href="https://api.whatsapp.com/send?text=Join%20us%20for%20these%20benefits:%20%0A📢%2010%2B%20daily%20job%20and%20internship%20updates%0A🔗%20Exclusive%20referral%20links%20for%20better%20opportunities%0A🎓%20Free%20courses%20to%20enhance%20your%20skills%0A💡%20Proven%20interview%20tips%20%26%20preparation%0A❓%20Common%20interview%20questions%20to%20ace%20your%20next%20interview%20%0A%0AReferral%20link:%20{{ logged_in_user_referral_link }}" target="_blank" class="btn btn-outline-success text-white">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Add the following script at the end of your HTML or in a separate JS file -->
+<script>
+function copyToClipboard() {
+    // Create a temporary textarea to hold the copy text
+    const tempInput = document.createElement('textarea');
+    tempInput.value = `Join us for these benefits:\n\n📢 10+ daily job and internship updates\n🔗 Exclusive referral links for better opportunities\n🎓 Free courses to enhance your skills\n💡 Proven interview tips & preparation\n❓ Common interview questions to ace your next interview\n\nReferral link: {{ logged_in_user_referral_link }}`;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    alert('Referral message copied to clipboard!');
+}
+</script>
+
+{% endblock %}
+
