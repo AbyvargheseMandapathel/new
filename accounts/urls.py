@@ -9,6 +9,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('signup/', views.signup, name='signup'),
+    path('email-verification/', views.email_verification, name='email_verification'),
+
     
     path('password_reset/', views.password_reset_request, name='password_reset_request'),
     path('reset/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
@@ -27,6 +29,5 @@ urlpatterns = [
     path('coupons/', views.coupon_list, name='coupon_list'),
     path('coupons/add/', views.add_coupon, name='add_coupon'),
     path('coupons/edit/', views.edit_coupon, name='edit_coupon'),
-    path('coupons/delete/', views.delete_coupon, name='delete_coupon')
-
+    path('coupons/delete/', views.delete_coupon, name='delete_coupon'),
 ]

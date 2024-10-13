@@ -35,7 +35,7 @@
   {% for job in job_alerts %}
   <div class="col">
     <div class="card h-100">
-      <img src="{% if job.image %}{{ job.image.url }}{% else %}{% static 'img/course/small/course-5.webp' %}{% endif %}" class="card-img-top sh-22" alt="job image" />
+      <img src="{% if job.image %}{{ job.image.url }}{% else %}https://i.imgur.com/TxT6z9Y.jpeg{% endif %}" class="card-img-top sh-22" alt="job image" />
       <div class="card-body">
         <h5 class="heading mb-0">
           <a href="{% url 'accounts:job_description' job.pk %}" class="body-link">{{ job.title }}</a>

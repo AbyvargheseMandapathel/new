@@ -108,7 +108,7 @@ def signup(request):
         email.send()
 
         messages.success(request, 'Account created. Please check your email to verify your account.')
-        return redirect('accounts:login')
+        return redirect('accounts:email_verification')
 
     referral_code = request.GET.get('referral', '')
 
@@ -571,4 +571,8 @@ def delete_coupon(request):
             messages.error(request, 'Coupon ID not provided.')
 
     return redirect('accounts:coupon_list') 
+
+
+def email_verification(request):
+    return render(request, 'accounts/email_verification.html')
 
