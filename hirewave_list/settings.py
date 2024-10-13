@@ -155,8 +155,8 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'edxfr3q@gmail.com'
-EMAIL_HOST_PASSWORD = 'mkzdmckbuujxvemm'
+EMAIL_HOST_USER = 'hirewave.alerts@gmail.com'
+EMAIL_HOST_PASSWORD = 'hitgtotiltzgbdhv'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 MEDIA_URL = '/media/'
