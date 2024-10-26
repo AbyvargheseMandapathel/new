@@ -8,7 +8,7 @@ async def send_job_alert_to_telegram(job_alert):
     bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
     
     # Construct the job description link
-    job_description_link = f"http://{settings.SITE_URL}/job/{job_alert.pk}/"
+    job_description_link = f"{settings.SITE_URL}/job/{job_alert.pk}/"
     
     # Create the message with the job description link
     message = (
@@ -16,7 +16,6 @@ async def send_job_alert_to_telegram(job_alert):
         f"{job_alert.company_name}"
         f"is HIring! for "
         f"{job_alert.title}\n"
-        f"Description: {job_alert.job_description}\n"
         f"Apply Now: {job_description_link}"
     )
     

@@ -72,7 +72,6 @@ Detail{% endblock %} {% load static %} {% block content %}
                 <h4 class="mb-3">{{ job_alert.title }}</h4>
                 <div>
                   <p>{{ job_alert.job_description|safe }}</p>
-                  <p>{{ job_alert.company_name }}</p>
                   <div>
                     {% if is_premium %}
                     <a

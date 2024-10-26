@@ -61,13 +61,14 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://8fd7-103-159-151-83.ngrok-free.app',  # Ngrok URL
+    'https://hirewave.online',  # Domain URL
+    'http://13.60.231.19',      # IP address
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://8fd7-103-159-151-83.ngrok-free.app', 
+    'https://hirewave.online',  # Domain URL
+    'http://13.60.231.19',      # IP address
 ]
-
 ROOT_URLCONF = 'hirewave_list.urls'
 
 TEMPLATES = [
@@ -162,9 +163,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-TELEGRAM_BOT_TOKEN = '6884539721:AAEf_tYPrvf6tIX6vzLeh2Xx8XSQ2Uud5E8'  # Replace with your actual Telegram bot token
-TELEGRAM_CHAT_ID = '-1002096731474'
-SITE_URL = 'https://8fd7-103-159-151-83.ngrok-free.app'
+TELEGRAM_BOT_TOKEN = '6884539721:AAEf_tYPrvf6tIX6vzLeh2Xx8XSQ2Uud5E8'  
+TELEGRAM_CHAT_ID = '-1001847707695'
+SITE_URL = 'https://hirewave.online'
 
 
 STATIC_URL = '/static/'

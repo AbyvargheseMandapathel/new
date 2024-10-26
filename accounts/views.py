@@ -92,7 +92,7 @@ def signup(request):
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         domain = get_current_site(request).domain
-        verification_link = f"http://{domain}/verify/{uid}/{token}/"
+        verification_link = f"https://hirewave.online/verify/{uid}/{token}/"
         subject = "Verify Your Email"
 
         # Render the HTML content for the email
@@ -200,7 +200,7 @@ def password_reset_request(request):
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             domain = get_current_site(request).domain
-            link = f"http://{domain}/reset/{uid}/{token}/"
+            link = f"https://hirewave.online/reset/{uid}/{token}/"
 
             # Subject of the email
             subject = "Password Reset Request"
