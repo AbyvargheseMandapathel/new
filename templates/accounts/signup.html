@@ -35,20 +35,12 @@
         <form id="registerForm" class="tooltip-end-bottom" method="POST">
             {% csrf_token %}
           <div class="row">
-            <div class="col-md-6 mb-3 filled form-group tooltip-end-top">
+            <div class="mb-3 filled form-group tooltip-end-top">
               <i data-acorn-icon="user"></i>
               <input
                 class="form-control"
-                placeholder="First Name"
-                name="first_name"
-              />
-            </div>
-            <div class="col-md-6 mb-3 filled form-group tooltip-end-top">
-              <i data-acorn-icon="user"></i>
-              <input
-                class="form-control"
-                placeholder="Last Name"
-                name="last_name"
+                placeholder="Full Name"
+                name="name"
               />
             </div>
           </div>

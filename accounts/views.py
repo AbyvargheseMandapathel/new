@@ -47,8 +47,7 @@ def signup(request):
         return redirect('accounts:dashboard')
 
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
+        name = request.POST.get('name','').strip()
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -80,8 +79,7 @@ def signup(request):
             username=username,
             email=email,
             password=password,
-            first_name=first_name,
-            last_name=last_name,
+            name = name,
             college_name=college_name,
             passout_year=passout_year,
             referred_by=referrer  # Set the referrer if available
@@ -368,7 +366,8 @@ def referral_leaderboard(request):
     user_rank = next((entry['rank'] for entry in leaderboard if entry['referrer'] == request.user), None)
 
     # Generate referral link for the logged-in user
-    logged_in_user_referral_link = request.build_absolute_uri(f'/signup/?referral={request.user.referral_code}')
+    logged_in_user_referral_link = f'https://hirewave.online/signup/?referral={request.user.referral_code}'
+
 
     return render(request, 'accounts/leaderboard.html', {
         'leaderboard': leaderboard,
@@ -576,3 +575,45 @@ def delete_coupon(request):
 def email_verification(request):
     return render(request, 'accounts/email_verification.html')
 
+
+def send_recent_job_alerts_email(request):
+    # Define recipient email and subject
+    recipient_email = 'edxfr3q@gmail.com'
+    subject = "Job Alerts from the Last 24 Hours"
+    
+    # Calculate the time 24 hours ago
+    time_threshold = timezone.now() - timedelta(hours=24)
+    
+    # Retrieve all job alerts posted within the last 24 hours
+    recent_job_alerts = JobAlert.objects.filter(created_at__gte=time_threshold)
+
+    # Format the email body
+    if recent_job_alerts.exists():
+        message_body = "Here are the latest job alerts posted in the last 24 hours:\n\n"
+        for alert in recent_job_alerts:
+            message_body += (
+                f"🔔 **Title:** {alert.title}\n"
+                f"🏢 **Company:** {alert.company_name}\n"
+                f"🔗 ** Link:** : https://hirewave.online/job/{alert.pk}/\n\n"
+                "📲 **For More: https://whatsapp.com/channel/0029Va9NJdO6buMJkJrTkS3p\n\n"
+                "----------------------------------------------------------\n\n"
+            )
+    else:
+        message_body = "No new job alerts have been posted in the last 24 hours."
+
+    # Send the email
+    email_sent = send_mail(
+        subject=subject,
+        message=message_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[recipient_email],
+        fail_silently=False,
+    )
+
+    # Prepare the JSON response
+    response_data = {
+        'status': 'success' if email_sent else 'failed',
+        'message': 'Email sent with recent job alerts' if email_sent else 'Failed to send email'
+    }
+
+    return JsonResponse(response_data)

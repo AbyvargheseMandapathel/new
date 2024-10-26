@@ -30,4 +30,5 @@ urlpatterns = [
     path('coupons/add/', views.add_coupon, name='add_coupon'),
     path('coupons/edit/', views.edit_coupon, name='edit_coupon'),
     path('coupons/delete/', views.delete_coupon, name='delete_coupon'),
+    path('send-job-alerts-email/', views.send_recent_job_alerts_email, name='send_job_alerts_email'),
 ]
