@@ -31,4 +31,7 @@ urlpatterns = [
     path('coupons/edit/', views.edit_coupon, name='edit_coupon'),
     path('coupons/delete/', views.delete_coupon, name='delete_coupon'),
     path('send-job-alerts-email/', views.send_recent_job_alerts_email, name='send_job_alerts_email'),
+    
+    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    path('create-blog/', views.create_blog, name='create_blog'),
 ]

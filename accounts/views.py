@@ -33,7 +33,7 @@ from django.views.decorators.http import require_POST
 
 
 
-from .models import Coupon, CustomUser, JobAlert, WebsiteVisit
+from .models import Blog, Coupon, CustomUser, JobAlert, WebsiteVisit
 from .utils import send_job_alert_to_telegram
 from accounts import models
 from django.core.paginator import Paginator
@@ -617,3 +617,44 @@ def send_recent_job_alerts_email(request):
     }
 
     return JsonResponse(response_data)
+
+
+def blog_detail(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)
+
+    if blog.is_premium and (not request.user.is_authenticated or not request.user.is_premium_valid()):
+        return render(request, 'accounts/no_access.html')  # Render a page for non-premium users
+
+    blog.views += 1
+    blog.save()
+    return render(request, 'accounts/blog_detail.html', {'blog': blog})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def create_blog(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        slug = request.POST.get('slug')
+        content = request.POST.get('content')
+        cover_image = request.POST.get('cover_image')
+        tags = request.POST.get('tags')
+        
+        blog = Blog(
+            title=title,
+            slug=slug,
+            content=content,
+            cover_image=cover_image,
+            author=request.user  # Set the logged-in user as the author
+        )
+
+        # Save the blog post
+        blog.save()
+        
+        # Assign tags if any
+        if tags:
+            blog.tags.set([tag.strip() for tag in tags.split(',')])
+
+        messages.success(request, 'Blog post created successfully.')
+        return redirect('accounts:blog_detail', slug=blog.slug)  
+
+    return render(request, 'accounts/create_blog.html')

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Coupon, CustomUser, JobAlert, WebsiteVisit
+from .models import Blog, Category, Coupon, CustomUser, JobAlert, WebsiteVisit
 from django.utils import timezone
 from datetime import timedelta
 
@@ -38,3 +38,15 @@ class WebsiteVisitAdmin(admin.ModelAdmin):
     list_display = ('ip_address', 'user_agent', 'visited_at')
     list_filter = ('visited_at',)
     search_fields = ('ip_address', 'user_agent')
+    
+    
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'category', 'is_premium', 'views', 'created_at')
+    list_filter = ('category', 'is_premium', 'author')
+    search_fields = ('title', 'content')
+    prepopulated_fields = {'slug': ('title',)}  # Auto-generate slug from title

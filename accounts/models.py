@@ -4,6 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from django_ckeditor_5.fields import CKEditor5Field
+from django.utils.text import slugify
+from taggit.managers import TaggableManager
 
 
 class CustomUser(AbstractUser):
@@ -116,3 +118,39 @@ class WebsiteVisit(models.Model):
         if date is None:
             date = timezone.now().date()
         return cls.objects.filter(visited_at__date=date).values('ip_address').distinct().count()
+    
+    
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    content = CKEditor5Field('Content', config_name='default')
+    cover_image = models.URLField(blank=True, null=True)
+    tags = TaggableManager()
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="blogs")
+    is_premium = models.BooleanField(default=False)
+    views = models.PositiveIntegerField(default=0)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="blogs")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+            # Ensure the slug is unique
+            original_slug = self.slug
+            counter = 1
+            while Blog.objects.filter(slug=self.slug).exists():
+                self.slug = f"{original_slug}-{counter}"
+                counter += 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+    
+    
