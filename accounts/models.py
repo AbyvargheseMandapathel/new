@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 from django_ckeditor_5.fields import CKEditor5Field
@@ -153,4 +154,76 @@ class Blog(models.Model):
     def __str__(self):
         return self.title
     
-    
+class Course(models.Model):
+    LEVEL_CHOICES = [
+        ('Beginner', 'Beginner'),
+        ('Intermediate', 'Intermediate'),
+        ('Advanced', 'Advanced'),
+    ]
+
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    description = CKEditor5Field('Course Description', config_name='default')
+    created_at = models.DateTimeField(auto_now_add=True)
+    language = models.CharField(max_length=50)
+    enrollments = models.PositiveIntegerField(default=0)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
+    instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='courses')
+    tags = TaggableManager()  
+    level = models.CharField(max_length=12, choices=LEVEL_CHOICES, default='Beginner')
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('accounts:course_overview', args=[str(self.id)])
+
+
+class Chapter(models.Model):
+    title = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='chapters')
+    content = CKEditor5Field('Course Content', config_name='default')
+    order = models.PositiveIntegerField(editable=True)
+
+    def save(self, *args, **kwargs):
+        if not self.order:
+            self.order = self.course.chapters.count() + 1
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.order}. {self.title}"
+
+    class Meta:
+        ordering = ['order']
+
+
+class Enrollment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} enrolled in {self.course.title}"
+
+    def completion_percentage(self):
+        total_chapters = self.course.chapters.count()
+        completed_chapters = self.progresses.filter(completed=True).count()
+        return (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
+
+
+class Progress(models.Model):
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='progresses')
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('enrollment', 'chapter')
+
+    def __str__(self):
+        return f"{self.chapter.title} - {'Completed' if self.completed else 'Not Completed'}"

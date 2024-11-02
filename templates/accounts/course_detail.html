@@ -1,0 +1,43 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Course Content - {{ chapter.title }}{% endblock %}
+{% load static %}
+
+{% block content %}
+<!-- chapter_detail.html -->
+<h1>{{ chapter.title }}</h1>
+<div>
+    {{ chapter.content|safe }}  <!-- Use 'safe' to render HTML content if CKEditor is used -->
+</div>
+
+<!-- Mark as Completed Button -->
+<form method="POST" action="">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success" {% if completed %}disabled{% endif %}>Mark as Completed</button>
+</form>
+
+<!-- Table of Contents -->
+<h2 class="small-title">Table of Contents</h2>
+<div class="card mb-5">
+    <div class="card-body">
+        <div class="row g-0">
+            <div class="col mb-4">
+                <div class="h-100">
+                    <div class="d-flex flex-column justify-content-start">
+                        {% for chap in course.chapters.all %}
+                            <div>
+                                <p class="heading {% if chap.id == chapter.id %}text-success{% else %}text-muted{% endif %}">
+                                    {{ forloop.counter }}. {{ chap.title }} 
+                                    {% if chap.id == chapter.id %} (Current) {% endif %}
+                                </p>
+                            </div>
+                        {% empty %}
+                            <p>No chapters available.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

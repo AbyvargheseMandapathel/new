@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Blog, Category, Coupon, CustomUser, JobAlert, WebsiteVisit
+from .models import Blog, Category, Chapter, Coupon, Course, CustomUser, Enrollment, JobAlert, Progress, WebsiteVisit
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.html import format_html
 
 @admin.register(JobAlert)
 class JobAlertAdmin(admin.ModelAdmin):
@@ -50,3 +51,26 @@ class BlogAdmin(admin.ModelAdmin):
     list_filter = ('category', 'is_premium', 'author')
     search_fields = ('title', 'content')
     prepopulated_fields = {'slug': ('title',)}  # Auto-generate slug from title
+    
+    
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('title', 'instructor', 'created_at', 'enrollments', 'rating')
+    search_fields = ('title', 'instructor__username')
+    prepopulated_fields = {'slug': ('title',)}
+
+@admin.register(Chapter)
+class ChapterAdmin(admin.ModelAdmin):
+    list_display = ('title', 'course', 'order')
+    list_filter = ('course',)
+    ordering = ('course', 'order')
+
+@admin.register(Enrollment)
+class EnrollmentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'created_at')
+    list_filter = ('course', 'user')
+
+@admin.register(Progress)
+class ProgressAdmin(admin.ModelAdmin):
+    list_display = ('enrollment', 'chapter', 'completed')
+    list_filter = ('enrollment__course', 'completed')

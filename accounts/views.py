@@ -33,7 +33,7 @@ from django.views.decorators.http import require_POST
 
 
 
-from .models import Blog, Coupon, CustomUser, JobAlert, WebsiteVisit
+from .models import Blog, Chapter, Coupon, Course, CustomUser, Enrollment, JobAlert, Progress, WebsiteVisit
 from .utils import send_job_alert_to_telegram
 from accounts import models
 from django.core.paginator import Paginator
@@ -656,5 +656,76 @@ def create_blog(request):
 
         messages.success(request, 'Blog post created successfully.')
         return redirect('accounts:blog_detail', slug=blog.slug)  
+    
+    
+@login_required
+def course_overview(request, course_id):
+    """Displays the course overview page with enrollment option."""
+    course = get_object_or_404(Course, id=course_id)
 
-    return render(request, 'accounts/create_blog.html')
+    # Check if the user is already enrolled in the course
+    enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+    
+    # Calculate progress percentage based on completed chapters
+    total_chapters = course.chapters.count()
+    completed_chapters = enrollment.progresses.filter(completed=True).count() if enrollment else 0
+    progress_percentage = (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
+    
+    # Get the last completed chapter, if any
+    last_chapter = enrollment.progresses.filter(completed=True).order_by('-id').first().chapter if enrollment and enrollment.progresses.filter(completed=True).exists() else None
+
+    return render(request, 'accounts/course_overview.html', {
+        'course': course,
+        'enrollment': enrollment,
+        'progress_percentage': progress_percentage,
+        'last_chapter': last_chapter,
+    })
+
+@login_required
+def enroll_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
+    
+    # Redirect to the first chapter of the course
+    first_chapter = course.chapters.first()
+    if first_chapter:
+        return redirect('accounts:course_content_view', course_id=course.id, chapter_id=first_chapter.id)
+    else:
+        return redirect('accounts:course_overview', course_id=course.id)  
+
+@login_required
+def course_content_view(request, course_id, chapter_id):
+    """Displays the content of a specific chapter and manages completion."""
+    course = get_object_or_404(Course, id=course_id)
+    chapter = get_object_or_404(Chapter, id=chapter_id, course=course)
+    
+    # Check enrollment
+    enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
+    
+    # Get or create progress for the current chapter
+    progress, _ = Progress.objects.get_or_create(enrollment=enrollment, chapter=chapter)
+
+    # Handle "Mark as Completed" functionality
+    if request.method == 'POST':
+        if not progress.completed:
+            progress.completed = True
+            progress.save()
+            messages.success(request, f'Chapter "{chapter.title}" marked as completed.')
+            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter.id + 1)
+    
+    # Prevent accessing next chapter if current is not completed
+    if chapter_id > 1:
+        previous_chapter = get_object_or_404(Chapter, id=chapter_id - 1, course=course)
+        previous_progress = Progress.objects.filter(enrollment=enrollment, chapter=previous_chapter).first()
+        if not previous_progress or not previous_progress.completed:
+            messages.warning(request, "You must complete the previous chapter before accessing this one.")
+            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter_id - 1)
+
+    return render(request, 'accounts/course_detail.html', {
+        'course': course,
+        'chapter': chapter,
+        'completed': progress.completed,
+    })
+
+
+

@@ -34,4 +34,9 @@ urlpatterns = [
     
     path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     path('create-blog/', views.create_blog, name='create_blog'),
+    
+    path('course/<int:course_id>/', views.course_overview, name='course_overview'),
+    path('course/<int:course_id>/chapter/<int:chapter_id>/', views.course_content_view, name='course_content_view'),
+    path('course/<int:course_id>/enroll/', views.enroll_course, name='enroll_course'),
+
 ]

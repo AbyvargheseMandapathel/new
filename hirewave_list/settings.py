@@ -206,11 +206,27 @@ customColorPalette = [
         },
     ]
 
+
 CKEDITOR_5_CONFIGS = {
     'default': {
-        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
-                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
-
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'link',
+            'bulletedList', 'numberedList', 'blockQuote', 
+            'imageUpload', 'codeBlock',  # Add 'codeBlock' here for the default toolbar
+            'fontColor', 'fontBackgroundColor'  # Add text color and background color options
+        ],
+        'codeBlock': {  # Code block plugin configuration for default
+            'languages': [
+                {'language': 'plaintext', 'label': 'Plain text'},
+                {'language': 'python', 'label': 'Python'},
+                {'language': 'javascript', 'label': 'JavaScript'},
+                {'language': 'html', 'label': 'HTML'},
+                {'language': 'css', 'label': 'CSS'},
+                {'language': 'ruby', 'label': 'Ruby'},
+                {'language': 'java', 'label': 'Java'},
+                {'language': 'csharp', 'label': 'C#'},
+            ]
+        }
     },
     'extends': {
         'blockToolbar': [
@@ -219,27 +235,56 @@ CKEDITOR_5_CONFIGS = {
             'bulletedList', 'numberedList',
             '|',
             'blockQuote',
+            '|',
+            'codeBlock'  # Add 'codeBlock' here for extended options
         ],
-        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
-        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
-                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
-                    'insertTable',],
-        'image': {
-            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
-                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
-            'styles': [
-                'full',
-                'side',
-                'alignLeft',
-                'alignRight',
-                'alignCenter',
+        'toolbar': [
+            'heading', '|', 'outdent', 'indent', '|', 
+            'bold', 'italic', 'link', 'underline', 'strikethrough',
+            'code', 'subscript', 'superscript', 'highlight', 
+            '|', 'fontColor', 'fontBackgroundColor',  # Add text color and background color options
+            'codeBlock', 'sourceEditing', 'insertImage',
+            'bulletedList', 'numberedList', 'todoList', 
+            '|', 'blockQuote', 'imageUpload', '|',
+            'fontSize', 'fontFamily', 
+            'mediaEmbed', 'removeFormat',
+            'insertTable',
+        ],
+        'fontColor': {
+            'colors': [
+                {'color': '#000000', 'label': 'Black'},  # Black color option
+                {'color': '#FF0000', 'label': 'Red'},
+                {'color': '#00FF00', 'label': 'Green'},
+                {'color': '#0000FF', 'label': 'Blue'},
+                {'color': '#FFFFFF', 'label': 'White'},
+                # Add more colors as needed
             ]
-
+        },
+        'fontBackgroundColor': {
+            'colors': [
+                {'color': '#FFFFFF', 'label': 'White'},  # White background option
+                {'color': '#FFFF00', 'label': 'Yellow'},
+                {'color': '#FF0000', 'label': 'Red'},
+                {'color': '#00FF00', 'label': 'Green'},
+                {'color': '#0000FF', 'label': 'Blue'},
+                # Add more background colors as needed
+            ]
+        },
+        'image': {
+            'toolbar': [
+                'imageTextAlternative', '|', 
+                'imageStyle:alignLeft', 'imageStyle:alignRight', 
+                'imageStyle:alignCenter', 'imageStyle:side', '|'
+            ],
+            'styles': [
+                'full', 'side', 'alignLeft', 'alignRight', 'alignCenter',
+            ]
         },
         'table': {
-            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
-            'tableProperties', 'tableCellProperties' ],
+            'contentToolbar': [
+                'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties'
+            ],
             'tableProperties': {
                 'borderColors': customColorPalette,
                 'backgroundColors': customColorPalette
@@ -249,12 +294,24 @@ CKEDITOR_5_CONFIGS = {
                 'backgroundColors': customColorPalette
             }
         },
-        'heading' : {
+        'heading': {
             'options': [
-                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
-                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
-                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
-                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        },
+        'codeBlock': { 
+            'languages': [
+                {'language': 'plaintext', 'label': 'Plain text'},
+                {'language': 'python', 'label': 'Python'},
+                {'language': 'javascript', 'label': 'JavaScript'},
+                {'language': 'html', 'label': 'HTML'},
+                {'language': 'css', 'label': 'CSS'},
+                {'language': 'ruby', 'label': 'Ruby'},
+                {'language': 'java', 'label': 'Java'},
+                {'language': 'csharp', 'label': 'C#'},
             ]
         }
     },
@@ -268,7 +325,10 @@ CKEDITOR_5_CONFIGS = {
 }
 
 
-CKEDITOR_5_CUSTOM_CSS = 'css/ckeditor5/admin_dark_mode_fix.css'
+
+
+
+# CKEDITOR_5_CUSTOM_CSS = 'css/ckeditor5/admin_dark_mode_fix.css'
 
 
 

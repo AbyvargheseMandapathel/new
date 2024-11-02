@@ -61,14 +61,30 @@
     </div>
 </section>
 
-<!-- Include CKEditor JS from CDN -->
-<script src="https://cdn.ckeditor.com/ckeditor5/38.0.0/classic/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
 <script>
+    console.log("Welcome")
     let editor;
 
-    // Initialize CKEditor
     ClassicEditor
-        .create(document.querySelector('#content'))
+        .create(document.querySelector('#content'), {
+            codeBlock: {
+                languages: [
+                    { language: 'python', label: 'Python' },
+                    { language: 'javascript', label: 'JavaScript' },
+                    { language: 'html', label: 'HTML' },
+                ]
+            },
+            mediaEmbed: {  // Enable media embed functionality
+                previewsInDataBinder: true  // Optionally enable preview in the data binder
+            },
+            toolbar: [
+                'heading', '|', 'bold', 'italic', 'link',
+                'bulletedList', 'numberedList', 'blockQuote',
+                'imageUpload', 'codeBlock', 'mediaEmbed',  // Add mediaEmbed to toolbar
+                'fontColor', 'fontBackgroundColor'  // Text color options if you have them
+            ],
+        })
         .then(newEditor => {
             editor = newEditor;
         })
@@ -88,6 +104,7 @@
         return true; 
     }
 </script>
+
 
 <style>
     .ck-editor__editable {

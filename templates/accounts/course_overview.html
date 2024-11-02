@@ -1,0 +1,242 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <!-- Title and Top Buttons Start -->
+        <div class="page-title-container">
+            <div class="row">
+                <!-- Title Start -->
+                <div class="col-12 col-sm-6">
+                    <h1 class="mb-0 pb-0 display-4" id="title">{{ course.title }}</h1>
+                    <nav class="breadcrumb-container d-inline-block" aria-label="breadcrumb">
+                        <ul class="breadcrumb pt-0">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item"><a href="Course.Explore.html">Courses</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <!-- Title End -->
+
+                {% if user.is_authenticated %}
+                {% if enrollment %}
+                    <!-- User is enrolled -->
+                    {% if last_chapter %}
+                        <a href="{% url 'accounts:course_content_view' course.id last_chapter.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                            <i data-acorn-icon="chevron-right"></i>
+                            <span>Continue Learning</span>
+                        </a>
+                    {% else %}
+                        <p>No chapters completed yet.</p>
+                        <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                            <i data-acorn-icon="chevron-right"></i>
+                            <span>Enroll</span>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <!-- User is not enrolled -->
+                    <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                        <i data-acorn-icon="chevron-right"></i>
+                        <span>Enroll</span>
+                    </a>
+                {% endif %}
+            {% else %}
+                <!-- User is not authenticated -->
+                <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                    <i data-acorn-icon="chevron-right"></i>
+                    <span>Enroll</span>
+                </a>
+            {% endif %}
+            
+
+
+        </div>
+        <!-- Title and Top Buttons End -->
+
+        <!-- Content Start -->
+
+        <div class="row">
+            <!-- Left Side Start -->
+            <div class="col-12 col-xxl-8 mb-5">
+                <!-- Preview Start -->
+                <h2 class="small-title">Preview</h2>
+                <div class="card mb-5">
+                    <div class="card-img-top">
+                        <video class="player sh-50 cover" poster="img/course/large/course-1.webp" id="videoPlayer">
+                            <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" type="video/mp4" />
+                        </video>
+                    </div>
+                    <div class="card-body">
+                        {{ course.description | safe }}
+                    </div>
+                    <div class="card-footer border-0 pt-0">
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="sw-5 d-inline-block position-relative me-3">
+                                        <img src="img/profile/profile-1.webp" class="img-fluid rounded-xl" alt="thumb" />
+                                    </div>
+                                    <div class="d-inline-block">
+                                        <a href="#">{{ course.instructor }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 text-muted">
+                                <div class="row g-0 justify-content-end">
+                                    <div class="col-auto pe-3">
+                                        <i data-acorn-icon="eye" class="text-primary me-1" data-acorn-size="15"></i>
+                                        <span class="align-middle">4.8K</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i data-acorn-icon="message" class="text-primary me-1" data-acorn-size="15"></i>
+                                        <span class="align-middle">12</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Preview End -->
+
+                <!-- Table of Contents Start -->
+                <h2 class="small-title">Table of Contents</h2>
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <div class="row g-0">
+                            <div class="col mb-4">
+                                <div class="h-100">
+                                    <div class="d-flex flex-column justify-content-start">
+                                        {% for chapter in course.chapters.all %}
+                                            <div>
+                                                <p class="heading">{{ forloop.counter }}. {{ chapter.title }}</p>  <!-- Numbered chapters -->
+                                            </div>
+                                        {% empty %}
+                                            <p>No chapters available for this course.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Table of Contents End -->
+
+            </div>
+            <!-- Left Side End -->
+
+            <!-- Right Side Start -->
+            <div class="col-12 col-xxl-4 mb-n5">
+                <!-- At a Glance Start -->
+                <h2 class="small-title">At a Glance</h2>
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <div class="row g-0 align-items-center mb-3">
+                            <div class="col-auto">
+                                <div class="sw-3 sh-4 d-flex justify-content-center align-items-center">
+                                    <i data-acorn-icon="clock" class="text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col ps-3">
+                                <div class="row g-0">
+                                    <div class="col">
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Content</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.headings.count }} Chapters</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 align-items-center mb-3">
+                            <div class="col-auto">
+                                <div class="sw-3 sh-4 d-flex justify-content-center align-items-center">
+                                    <i data-acorn-icon="diploma" class="text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col ps-3">
+                                <div class="row g-0">
+                                    <div class="col">
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Level</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.level }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 align-items-center mb-3">
+                            <div class="col-auto">
+                                <div class="sw-3 sh-4 d-flex justify-content-center align-items-center">
+                                    <i data-acorn-icon="calendar" class="text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col ps-3">
+                                <div class="row g-0">
+                                    <div class="col">
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Release</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.created_at|date:"Y-m-d" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 align-items-center mb-3">
+                            <div class="col-auto">
+                                <div class="sw-3 sh-4 d-flex justify-content-center align-items-center">
+                                    <i data-acorn-icon="star" class="text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col ps-3">
+                                <div class="row g-0">
+                                    <div class="col">
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Rating</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.rating }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 align-items-center mb-0">
+                            <div class="col-auto">
+                                <div class="sw-3 sh-4 d-flex justify-content-center align-items-center">
+                                    <i data-acorn-icon="graduation" class="text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="col ps-3">
+                                <div class="row g-0">
+                                    <div class="col">
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Students</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.enrolled_users.count }} Enrolled</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- At a Glance End -->
+
+                <!-- Instructor Start -->
+                <h2 class="small-title">Instructor</h2>
+                <div class="card mb-5">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="sw-5 d-inline-block position-relative me-3">
+                                <img src="img/profile/profile-1.webp" class="img-fluid rounded-xl" alt="thumb" />
+                            </div>
+                            <div class="d-inline-block">
+                                <div class="h5 mb-0">{{ course.instructor }}</div>
+                                <div class="text-muted">{{ course.instructor.bio }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Instructor End -->
+            </div>
+            <!-- Right Side End -->
+        </div>
+        <!-- Content End -->
+    </div>
+{% endblock %}
