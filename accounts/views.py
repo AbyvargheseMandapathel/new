@@ -698,13 +698,13 @@ def course_content_view(request, course_id, chapter_id):
     """Displays the content of a specific chapter and manages completion."""
     course = get_object_or_404(Course, id=course_id)
     chapter = get_object_or_404(Chapter, id=chapter_id, course=course)
-    
+
     # Check enrollment
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
-    
+
     # Get all chapters with their progress
     chapters = Chapter.objects.filter(course=course).prefetch_related('progress_set')
-    
+
     # Create a list of tuples (chapter, progress)
     chapters_with_progress = []
     for chap in chapters:
@@ -722,19 +722,19 @@ def course_content_view(request, course_id, chapter_id):
             messages.success(request, f'Chapter "{chapter.title}" marked as completed.')
             return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter.id)
 
-    # Allow access to the current chapter and any completed chapters
-    previous_chapter = chapter_id - 1
-    if previous_chapter > 0:
-        previous_progress = Progress.objects.filter(enrollment=enrollment, chapter_id=previous_chapter).first()
-        if previous_progress and not previous_progress.completed:
-            # Prevent access to the next chapter if it hasn't been completed
-            messages.warning(request, "You must complete the previous chapter before accessing this one.")
-            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=previous_chapter)
+    # Check the progress of all chapters
+    completed_chapters = [chap.id for chap, prog in chapters_with_progress if prog and prog.completed]
+    
+    # If the current chapter is not completed, check if it is accessible
+    if chapter.id > 1 and chapter.id - 1 not in completed_chapters:
+        messages.warning(request, "You must complete the previous chapter before accessing this one.")
+        # Redirect to the last completed chapter or the first chapter
+        last_completed_chapter = max(completed_chapters) if completed_chapters else 1
+        return redirect('accounts:course_content_view', course_id=course.id, chapter_id=last_completed_chapter)
 
     return render(request, 'accounts/course_detail.html', {
         'course': course,
         'chapter': chapter,
-        'chapters_with_progress': chapters_with_progress,  # Pass the list of tuples to the template
+        'chapters_with_progress': chapters_with_progress,
         'completed': progress.completed,
     })
-
