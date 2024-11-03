@@ -1,43 +1,119 @@
-{% extends 'accounts/base.html' %}
+{% extends 'accounts/base.html' %} {% block title %}Course Content - {{
+chapter.title }}{% endblock %} {% load static %} {% block content %}
+<div class="container">
+  <!-- Title and Top Buttons Start -->
+  <div class="page-title-container">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1 class="mb-0 pb-0 display-4" id="title">{{ chapter.title }}</h1>
+      </div>
+    </div>
+  </div>
+  <!-- Title and Top Buttons End -->
 
-{% block title %}Course Content - {{ chapter.title }}{% endblock %}
-{% load static %}
+  <!-- Content Start -->
+  <div class="row">
+    <!-- Left Side Start -->
+    <div class="col-12 col-xxl-8 mb-5">
+      <h2 class="small-title">Preview</h2>
+      <div class="card mb-5">
+        <div class="card-body">
+          <p class="mb-4">{{ chapter.content|safe }}</p>
+        </div>
+        <div class="card-footer border-0 pt-0">
+          <div class="row align-items-center">
+            <div class="col-6">
+              <div class="d-flex align-items-center">
+                <div class="sw-5 d-inline-block position-relative me-3">
+                  <img
+                    src="{% static 'img/profile/profile-1.webp' %}"
+                    class="img-fluid rounded-xl"
+                    alt="thumb"
+                  />
+                </div>
+                <div class="d-inline-block">
+                  <a href="#">{{ course.instructor }}</a>
+                  <div class="text-muted text-small">
+                    Created at: {{ course.created_at }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 text-muted">
+              <div class="row g-0 justify-content-end">
+                <div class="col-auto pe-3">
+                  <i
+                    data-acorn-icon="eye"
+                    class="text-primary me-1"
+                    data-acorn-size="15"
+                  ></i>
+                  <span class="align-middle">{{ chapter.views }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-{% block content %}
-<!-- chapter_detail.html -->
-<h1>{{ chapter.title }}</h1>
-<div>
-    {{ chapter.content|safe }}  <!-- Use 'safe' to render HTML content if CKEditor is used -->
-</div>
+      <!-- Mark as Completed Button -->
+      <form method="post" action="">
+        {% csrf_token %} {% if not completed %}
+        <button type="submit" class="btn btn-primary">Mark as Completed</button>
+        {% else %}
+        <span class="text-success">Completed!</span>
+        {% endif %}
+      </form>
+    </div>
+    <!-- Left Side End -->
 
-<!-- Mark as Completed Button -->
-<form method="POST" action="">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-success" {% if completed %}disabled{% endif %}>Mark as Completed</button>
-</form>
-
-<!-- Table of Contents -->
+    <!-- Right Side Start -->
+    <div class="col-12 col-xxl-4 mb-n5">
+<!-- Table of Contents Start -->
 <h2 class="small-title">Table of Contents</h2>
 <div class="card mb-5">
     <div class="card-body">
-        <div class="row g-0">
-            <div class="col mb-4">
-                <div class="h-100">
-                    <div class="d-flex flex-column justify-content-start">
-                        {% for chap in course.chapters.all %}
-                            <div>
-                                <p class="heading {% if chap.id == chapter.id %}text-success{% else %}text-muted{% endif %}">
-                                    {{ forloop.counter }}. {{ chap.title }} 
-                                    {% if chap.id == chapter.id %} (Current) {% endif %}
-                                </p>
-                            </div>
-                        {% empty %}
-                            <p>No chapters available.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <ul class="list-unstyled">
+            {% for chap, progress in chapters_with_progress %}
+                <li>
+                    {% if chap.id == chapter.id %}
+                        <!-- Current Chapter -->
+                        <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-warning">
+                            <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
+                        </a>
+                    {% elif progress and progress.completed %}
+                        <!-- Completed Chapter -->
+                        <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-success">
+                            <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
+                        </a>
+                    {% else %}
+                        <!-- Incomplete Chapter -->
+                        <a href="#" class="text-decoration-none text-muted">
+                            <i class="bi bi-lock"></i> {{ forloop.counter }}. {{ chap.title }}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
+<!-- Table of Contents End -->
+
+
+        </div>
+      </div>
+      <!-- Table of Contents End -->
+    </div>
+    <!-- Right Side End -->
+  </div>
+</div>
+
+<!-- Highlight.js inclusion -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>
+  hljs.highlightAll();
+</script>
 {% endblock %}

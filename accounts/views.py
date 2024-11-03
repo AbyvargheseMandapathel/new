@@ -702,6 +702,15 @@ def course_content_view(request, course_id, chapter_id):
     # Check enrollment
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
     
+    # Get all chapters with their progress
+    chapters = Chapter.objects.filter(course=course).prefetch_related('progress_set')
+    
+    # Create a list of tuples (chapter, progress)
+    chapters_with_progress = []
+    for chap in chapters:
+        progress = chap.progress_set.filter(enrollment=enrollment).first()
+        chapters_with_progress.append((chap, progress))
+
     # Get or create progress for the current chapter
     progress, _ = Progress.objects.get_or_create(enrollment=enrollment, chapter=chapter)
 
@@ -711,21 +720,21 @@ def course_content_view(request, course_id, chapter_id):
             progress.completed = True
             progress.save()
             messages.success(request, f'Chapter "{chapter.title}" marked as completed.')
-            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter.id + 1)
-    
-    # Prevent accessing next chapter if current is not completed
-    if chapter_id > 1:
-        previous_chapter = get_object_or_404(Chapter, id=chapter_id - 1, course=course)
-        previous_progress = Progress.objects.filter(enrollment=enrollment, chapter=previous_chapter).first()
-        if not previous_progress or not previous_progress.completed:
+            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter.id)
+
+    # Allow access to the current chapter and any completed chapters
+    previous_chapter = chapter_id - 1
+    if previous_chapter > 0:
+        previous_progress = Progress.objects.filter(enrollment=enrollment, chapter_id=previous_chapter).first()
+        if previous_progress and not previous_progress.completed:
+            # Prevent access to the next chapter if it hasn't been completed
             messages.warning(request, "You must complete the previous chapter before accessing this one.")
-            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter_id - 1)
+            return redirect('accounts:course_content_view', course_id=course.id, chapter_id=previous_chapter)
 
     return render(request, 'accounts/course_detail.html', {
         'course': course,
         'chapter': chapter,
+        'chapters_with_progress': chapters_with_progress,  # Pass the list of tuples to the template
         'completed': progress.completed,
     })
-
-
 

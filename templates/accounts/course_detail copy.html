@@ -1,0 +1,79 @@
+{% extends 'accounts/base.html' %} 
+{% block title %}Course Content - {{ chapter.title }}{% endblock %}
+{% load static %} 
+
+{% block content %}
+<div class="container">
+    <!-- Title and Breadcrumbs Start -->
+    <div class="page-title-container">
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <h1 class="mb-0 pb-0 display-4" id="title">{{ course.title }}</h1>
+                <nav class="breadcrumb-container d-inline-block" aria-label="breadcrumb">
+                    <ul class="breadcrumb pt-0">
+                        <li class="breadcrumb-item"><a href="">Courses</a></li>
+                        <li class="breadcrumb-item"><a href="">{{ course.title }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ chapter.title }}</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Title and Breadcrumbs End -->
+
+    <!-- Chapter Content Start -->
+    <div class="row">
+        <div class="col-12 col-xxl-8 mb-5">
+            <h2 class="small-title">{{ chapter.title }}</h2>
+            <div class="card mb-5">
+                <div class="card-body">
+                    <p class="mb-4">{{ chapter.content|safe }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side Start -->
+        <div class="col-12 col-xxl-4 mb-n5">
+            <!-- Mark as Completed Button -->
+            <form method="POST" action="" class="mb-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success w-100" {% if completed %}disabled{% endif %}>
+                    {% if completed %}Completed{% else %}Mark as Completed{% endif %}
+                </button>
+            </form>
+
+            <!-- Table of Contents Start -->
+            <h2 class="small-title">Table of Contents</h2>
+            <div class="card mb-5">
+                <div class="card-body">
+                    {% for ch in course.chapter_set.all %}
+                        <div class="mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="sw-5 d-inline-block position-relative me-3">
+                                    <div class="rounded-xl sw-5 sh-5 d-flex justify-content-center align-items-center {% if ch.id == chapter.id %}bg-primary{% elif ch in enrollment.completed_chapters.all %}bg-success{% else %}bg-muted{% endif %}">
+                                        {{ forloop.counter }}
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if ch in enrollment.completed_chapters.all or ch.id == chapter.id %}
+                                        <a href="{% url 'accounts:course_content_view' course.id ch.id %}">{{ ch.title }}</a>
+                                    {% else %}
+                                        <span class="text-muted">{{ ch.title }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Table of Contents End -->
+        </div>
+        <!-- Right Side End -->
+    </div>
+</div>
+
+<!-- Optional JavaScript for Highlighting (if needed) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+{% endblock %}
