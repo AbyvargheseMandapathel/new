@@ -1,0 +1,8 @@
+Dear {{ user.name }},
+
+Congratulations on successfully completing the course "{{ course.title }}"!
+
+We are pleased to send you your certificate of completion.
+
+Best regards,
+Your Course Team

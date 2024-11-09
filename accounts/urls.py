@@ -38,5 +38,6 @@ urlpatterns = [
     path('course/<int:course_id>/', views.course_overview, name='course_overview'),
     path('course/<int:course_id>/chapter/<int:chapter_id>/', views.course_content_view, name='course_content_view'),
     path('course/<int:course_id>/enroll/', views.enroll_course, name='enroll_course'),
+    path('course/<int:course_id>/send_certificate/', views.send_certificate_view, name='send_certificate_view'),
 
 ]

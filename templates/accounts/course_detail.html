@@ -47,15 +47,23 @@
         </div>
       </div>
 
-      <!-- Mark as Completed Button -->
-      <form method="post" action="">
-        {% csrf_token %}
-        {% if not completed %}
-          <button type="submit" class="btn btn-primary">Mark as Completed</button>
-        {% else %}
-          <span class="text-success">Completed!</span>
-        {% endif %}
-      </form>
+      <!-- Mark as Completed or Send Certificate Button -->
+<form method="post" action="">
+  {% csrf_token %}
+  {% if not completed %}
+    <button type="submit" class="btn btn-primary">Mark as Completed</button>
+  {% else %}
+    <!-- Check if this is the last chapter and change button text -->
+    {% if chapter.id == course.chapters.count %}
+      <button type="submit" formaction="{% url 'accounts:send_certificate_view' course.id %}" class="btn btn-success">
+        Send Certificate
+      </button>
+    {% else %}
+      <span class="text-success">Completed!</span>
+    {% endif %}
+  {% endif %}
+</form>
+
     </div>
     <!-- Left Side End -->
 

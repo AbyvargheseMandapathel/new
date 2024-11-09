@@ -29,14 +29,14 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.views.decorators.http import require_POST
-
-
-
-
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from .models import Blog, Chapter, Coupon, Course, CustomUser, Enrollment, JobAlert, Progress, WebsiteVisit
 from .utils import send_job_alert_to_telegram
 from accounts import models
 from django.core.paginator import Paginator
+from django.core.mail import EmailMessage
 
 User = get_user_model()
 
@@ -657,30 +657,6 @@ def create_blog(request):
         messages.success(request, 'Blog post created successfully.')
         return redirect('accounts:blog_detail', slug=blog.slug)  
     
-    
-# @login_required
-# def course_overview(request, course_id):
-#     """Displays the course overview page with enrollment option."""
-#     course = get_object_or_404(Course, id=course_id)
-
-#     # Check if the user is already enrolled in the course
-#     enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
-    
-#     # Calculate progress percentage based on completed chapters
-#     total_chapters = course.chapters.count()
-#     completed_chapters = enrollment.progresses.filter(completed=True).count() if enrollment else 0
-#     progress_percentage = (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
-    
-#     # Get the last completed chapter, if any
-#     last_chapter = enrollment.progresses.filter(completed=True).order_by('-id').first().chapter if enrollment and enrollment.progresses.filter(completed=True).exists() else None
-
-#     return render(request, 'accounts/course_overview.html', {
-#         'course': course,
-#         'enrollment': enrollment,
-#         'progress_percentage': progress_percentage,
-#         'last_chapter': last_chapter,
-#     })
-
 
 @login_required
 def course_overview(request, course_id):
@@ -716,7 +692,6 @@ def course_overview(request, course_id):
         'progress_percentage': progress_percentage,
         'last_chapter': last_chapter,
     })
-
 
 @login_required
 def enroll_course(request, course_id):
@@ -762,11 +737,37 @@ def course_content_view(request, course_id, chapter_id):
     # Get a list of completed chapters
     completed_chapters = [chap.id for chap, prog in chapters_with_progress if prog and prog.completed]
     
-    # Find the last completed chapter (if any)
-    last_completed_chapter = max(completed_chapters) if completed_chapters else 0
+    # Check if the course is completed
+    if len(completed_chapters) == course.chapters.count():
+        # Mark the course as completed for the user
+        if not enrollment.is_completed:
+            enrollment.is_completed = True
+            enrollment.completed_at = timezone.now()  # Save the completion time
+            enrollment.save()
 
-    # Determine the next accessible chapter (next chapter after the last completed chapter)
+            # Display success message
+            messages.success(request, f'You have completed the course "{course.title}"!')
+
+    # Determine the next accessible chapter (should not exceed the total number of chapters)
+    last_completed_chapter = max(completed_chapters) if completed_chapters else 0
     next_accessible_chapter_id = last_completed_chapter + 1 if last_completed_chapter > 0 else 1
+
+    # Ensure next_accessible_chapter_id doesn't go beyond the total chapters
+    if next_accessible_chapter_id > course.chapters.count():
+        next_accessible_chapter_id = course.chapters.count()
+
+    # If the course is completed, allow access but show a "Course Completed" message
+    if len(completed_chapters) == course.chapters.count():
+        messages.info(request, "You have completed the course!")
+
+        # No need to redirect, allow them to access any chapter
+        return render(request, 'accounts/course_detail.html', {
+            'course': course,
+            'chapter': chapter,
+            'chapters_with_progress': chapters_with_progress,
+            'completed': progress.completed,
+            'next_accessible_chapter_id': next_accessible_chapter_id,
+        })
 
     # If the current chapter is not completed, check if it is accessible
     if chapter.id > 1 and chapter.id - 1 not in completed_chapters:
@@ -781,3 +782,58 @@ def course_content_view(request, course_id, chapter_id):
         'completed': progress.completed,
         'next_accessible_chapter_id': next_accessible_chapter_id,
     })
+
+def send_certificate(user, course):
+    """Generates and sends a certificate to the user's email."""
+    # Generate the certificate PDF
+    pdf_buffer = BytesIO()
+    c = canvas.Canvas(pdf_buffer, pagesize=letter)
+    c.drawString(100, 750, f"Certificate of Completion")
+    c.drawString(100, 730, f"Presented to: {user.name}")
+    c.drawString(100, 710, f"For successfully completing the course: {course.title}")
+    c.drawString(100, 690, f"Date: {timezone.now().strftime('%Y-%m-%d')}")
+    c.showPage()
+    c.save()
+
+    # Prepare the PDF file for email attachment
+    pdf_buffer.seek(0)  # Move to the beginning of the buffer
+
+    # Email subject and message
+    subject = f"Your Certificate of Completion - {course.title}"
+    message = render_to_string('accounts/certificate_message.txt', {
+        'user': user,
+        'course': course,
+    })
+
+    # Create the email message object
+    email = EmailMessage(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],  # Ensure user.email is correct
+    )
+
+    # Attach the certificate PDF
+    email.attach('certificate.pdf', pdf_buffer.read(), 'application/pdf')
+
+    # Send email
+    email.send(fail_silently=False)
+    
+@login_required
+def send_certificate_view(request, course_id):
+    """Sends certificate upon request for the last chapter completion."""
+    course = get_object_or_404(Course, id=course_id)
+    enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
+
+    # Check if course is completed
+    if enrollment.is_completed:
+        if request.method == 'POST':
+            # Send the certificate to the user
+            send_certificate(request.user, course)
+            messages.success(request, f'Your certificate for the course "{course.title}" has been sent to your email.')
+        else:
+            messages.warning(request, "You must complete the course before requesting a certificate.")
+    else:
+        messages.warning(request, "You must complete the course before requesting a certificate.")
+
+    return redirect('accounts:course_content_view', course_id=course.id, chapter_id=course.chapters.count())

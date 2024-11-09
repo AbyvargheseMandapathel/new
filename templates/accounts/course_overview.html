@@ -21,10 +21,19 @@
                     {% if enrollment %}
                         <!-- User is enrolled -->
                         {% if last_chapter %}
-                            <a href="{% url 'accounts:course_content_view' course.id last_chapter.id|add:"1" %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
-                                <i data-acorn-icon="chevron-right"></i>
-                                <span>Continue Learning</span>
-                            </a>
+                            {% if last_chapter.id == course.chapters.last.id %}
+                                <!-- User is on the last chapter -->
+                                <a href="{% url 'accounts:course_content_view' course.id last_chapter.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                                    <i data-acorn-icon="chevron-right"></i>
+                                    <span>Resume Learning</span>
+                                </a>
+                            {% else %}
+                                <!-- Continue Learning Button (next chapter) -->
+                                <a href="{% url 'accounts:course_content_view' course.id last_chapter.id|add:"1" %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                                    <i data-acorn-icon="chevron-right"></i>
+                                    <span>Continue Learning</span>
+                                </a>
+                            {% endif %}
                         {% else %}
                             <p>No chapters completed yet.</p>
                             <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">

@@ -186,11 +186,20 @@ class Course(models.Model):
 
 class Chapter(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='chapters')
     content = CKEditor5Field('Course Content', config_name='default')
     order = models.PositiveIntegerField(editable=True)
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        # Ensure the slug is unique
+        count = 1
+        original_slug = self.slug
+        while Chapter.objects.filter(slug=self.slug).exists():
+            self.slug = f"{original_slug}-{count}"
+            count += 1
         if not self.order:
             self.order = self.course.chapters.count() + 1
         super().save(*args, **kwargs)
@@ -206,6 +215,7 @@ class Enrollment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_completed = models.BooleanField(default=False)  # Add this field
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
