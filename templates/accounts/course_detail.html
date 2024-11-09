@@ -1,5 +1,7 @@
-{% extends 'accounts/base.html' %} {% block title %}Course Content - {{
-chapter.title }}{% endblock %} {% load static %} {% block content %}
+{% extends 'accounts/base.html' %}
+{% block title %}Course Content - {{ chapter.title }}{% endblock %}
+{% load static %}
+{% block content %}
 <div class="container">
   <!-- Title and Top Buttons Start -->
   <div class="page-title-container">
@@ -25,28 +27,18 @@ chapter.title }}{% endblock %} {% load static %} {% block content %}
             <div class="col-6">
               <div class="d-flex align-items-center">
                 <div class="sw-5 d-inline-block position-relative me-3">
-                  <img
-                    src="{% static 'img/profile/profile-1.webp' %}"
-                    class="img-fluid rounded-xl"
-                    alt="thumb"
-                  />
+                  <img src="{% static 'img/profile/profile-1.webp' %}" class="img-fluid rounded-xl" alt="thumb" />
                 </div>
                 <div class="d-inline-block">
                   <a href="#">{{ course.instructor }}</a>
-                  <div class="text-muted text-small">
-                    Created at: {{ course.created_at }}
-                  </div>
+                  <div class="text-muted text-small">Created at: {{ course.created_at }}</div>
                 </div>
               </div>
             </div>
             <div class="col-6 text-muted">
               <div class="row g-0 justify-content-end">
                 <div class="col-auto pe-3">
-                  <i
-                    data-acorn-icon="eye"
-                    class="text-primary me-1"
-                    data-acorn-size="15"
-                  ></i>
+                  <i data-acorn-icon="eye" class="text-primary me-1" data-acorn-size="15"></i>
                   <span class="align-middle">{{ chapter.views }}</span>
                 </div>
               </div>
@@ -57,10 +49,11 @@ chapter.title }}{% endblock %} {% load static %} {% block content %}
 
       <!-- Mark as Completed Button -->
       <form method="post" action="">
-        {% csrf_token %} {% if not completed %}
-        <button type="submit" class="btn btn-primary">Mark as Completed</button>
+        {% csrf_token %}
+        {% if not completed %}
+          <button type="submit" class="btn btn-primary">Mark as Completed</button>
         {% else %}
-        <span class="text-success">Completed!</span>
+          <span class="text-success">Completed!</span>
         {% endif %}
       </form>
     </div>
@@ -68,37 +61,37 @@ chapter.title }}{% endblock %} {% load static %} {% block content %}
 
     <!-- Right Side Start -->
     <div class="col-12 col-xxl-4 mb-n5">
-<!-- Table of Contents Start -->
-<h2 class="small-title">Table of Contents</h2>
-<div class="card mb-5">
-    <div class="card-body">
-        <ul class="list-unstyled">
+      <!-- Table of Contents Start -->
+      <h2 class="small-title">Table of Contents</h2>
+      <div class="card mb-5">
+        <div class="card-body">
+          <ul class="list-unstyled">
             {% for chap, progress in chapters_with_progress %}
-                <li>
-                    {% if chap.id == chapter.id %}
-                        <!-- Current Chapter -->
-                        <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-warning">
-                            <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
-                        </a>
-                    {% elif progress and progress.completed %}
-                        <!-- Completed Chapter -->
-                        <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-success">
-                            <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
-                        </a>
-                    {% else %}
-                        <!-- Incomplete Chapter -->
-                        <a href="#" class="text-decoration-none text-muted">
-                            <i class="bi bi-lock"></i> {{ forloop.counter }}. {{ chap.title }}
-                        </a>
-                    {% endif %}
-                </li>
+              <li>
+                {% if chap.id == chapter.id %}
+                  <!-- Current Chapter -->
+                  <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-warning">
+                    <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
+                  </a>
+                {% elif progress and progress.completed %}
+                  <!-- Completed Chapter -->
+                  <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none text-success">
+                    <i class="bi bi-check-circle"></i> {{ forloop.counter }}. {{ chap.title }}
+                  </a>
+                {% elif chap.id == next_accessible_chapter_id %}
+                  <!-- Next Accessible Chapter -->
+                  <a href="{% url 'accounts:course_content_view' course.id chap.id %}" class="text-decoration-none">
+                    <i class="bi bi-unlock"></i> {{ forloop.counter }}. {{ chap.title }}
+                  </a>
+                {% else %}
+                  <!-- Inaccessible Chapter -->
+                  <a href="#" class="text-decoration-none text-muted">
+                    <i class="bi bi-lock"></i> {{ forloop.counter }}. {{ chap.title }}
+                  </a>
+                {% endif %}
+              </li>
             {% endfor %}
-        </ul>
-    </div>
-</div>
-<!-- Table of Contents End -->
-
-
+          </ul>
         </div>
       </div>
       <!-- Table of Contents End -->
@@ -108,10 +101,7 @@ chapter.title }}{% endblock %} {% load static %} {% block content %}
 </div>
 
 <!-- Highlight.js inclusion -->
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css"
-/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 <script>
   hljs.highlightAll();

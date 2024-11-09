@@ -658,6 +658,30 @@ def create_blog(request):
         return redirect('accounts:blog_detail', slug=blog.slug)  
     
     
+# @login_required
+# def course_overview(request, course_id):
+#     """Displays the course overview page with enrollment option."""
+#     course = get_object_or_404(Course, id=course_id)
+
+#     # Check if the user is already enrolled in the course
+#     enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+    
+#     # Calculate progress percentage based on completed chapters
+#     total_chapters = course.chapters.count()
+#     completed_chapters = enrollment.progresses.filter(completed=True).count() if enrollment else 0
+#     progress_percentage = (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
+    
+#     # Get the last completed chapter, if any
+#     last_chapter = enrollment.progresses.filter(completed=True).order_by('-id').first().chapter if enrollment and enrollment.progresses.filter(completed=True).exists() else None
+
+#     return render(request, 'accounts/course_overview.html', {
+#         'course': course,
+#         'enrollment': enrollment,
+#         'progress_percentage': progress_percentage,
+#         'last_chapter': last_chapter,
+#     })
+
+
 @login_required
 def course_overview(request, course_id):
     """Displays the course overview page with enrollment option."""
@@ -665,14 +689,26 @@ def course_overview(request, course_id):
 
     # Check if the user is already enrolled in the course
     enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
-    
+
     # Calculate progress percentage based on completed chapters
     total_chapters = course.chapters.count()
     completed_chapters = enrollment.progresses.filter(completed=True).count() if enrollment else 0
     progress_percentage = (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
-    
+
     # Get the last completed chapter, if any
     last_chapter = enrollment.progresses.filter(completed=True).order_by('-id').first().chapter if enrollment and enrollment.progresses.filter(completed=True).exists() else None
+
+    # If the user clicks on "Continue Learning," redirect to the next chapter
+    if request.method == 'POST' and 'continue_learning' in request.POST:
+        if last_chapter:
+            # Find the next chapter (the one after the last completed chapter)
+            next_chapter = course.chapters.filter(id__gt=last_chapter.id).first()
+
+            if next_chapter:
+                return redirect('course:chapter_detail', chapter_id=next_chapter.id)
+            else:
+                # If there's no next chapter, maybe show a message or redirect elsewhere
+                return redirect('course:course_complete')  # Optional: Redirect to a course completion page
 
     return render(request, 'accounts/course_overview.html', {
         'course': course,
@@ -680,6 +716,7 @@ def course_overview(request, course_id):
         'progress_percentage': progress_percentage,
         'last_chapter': last_chapter,
     })
+
 
 @login_required
 def enroll_course(request, course_id):
@@ -722,14 +759,19 @@ def course_content_view(request, course_id, chapter_id):
             messages.success(request, f'Chapter "{chapter.title}" marked as completed.')
             return redirect('accounts:course_content_view', course_id=course.id, chapter_id=chapter.id)
 
-    # Check the progress of all chapters
+    # Get a list of completed chapters
     completed_chapters = [chap.id for chap, prog in chapters_with_progress if prog and prog.completed]
     
+    # Find the last completed chapter (if any)
+    last_completed_chapter = max(completed_chapters) if completed_chapters else 0
+
+    # Determine the next accessible chapter (next chapter after the last completed chapter)
+    next_accessible_chapter_id = last_completed_chapter + 1 if last_completed_chapter > 0 else 1
+
     # If the current chapter is not completed, check if it is accessible
     if chapter.id > 1 and chapter.id - 1 not in completed_chapters:
         messages.warning(request, "You must complete the previous chapter before accessing this one.")
         # Redirect to the last completed chapter or the first chapter
-        last_completed_chapter = max(completed_chapters) if completed_chapters else 1
         return redirect('accounts:course_content_view', course_id=course.id, chapter_id=last_completed_chapter)
 
     return render(request, 'accounts/course_detail.html', {
@@ -737,4 +779,5 @@ def course_content_view(request, course_id, chapter_id):
         'chapter': chapter,
         'chapters_with_progress': chapters_with_progress,
         'completed': progress.completed,
+        'next_accessible_chapter_id': next_accessible_chapter_id,
     })

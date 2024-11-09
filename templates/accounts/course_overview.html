@@ -18,42 +18,39 @@
                 <!-- Title End -->
 
                 {% if user.is_authenticated %}
-                {% if enrollment %}
-                    <!-- User is enrolled -->
-                    {% if last_chapter %}
-                        <a href="{% url 'accounts:course_content_view' course.id last_chapter.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
-                            <i data-acorn-icon="chevron-right"></i>
-                            <span>Continue Learning</span>
-                        </a>
+                    {% if enrollment %}
+                        <!-- User is enrolled -->
+                        {% if last_chapter %}
+                            <a href="{% url 'accounts:course_content_view' course.id last_chapter.id|add:"1" %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                                <i data-acorn-icon="chevron-right"></i>
+                                <span>Continue Learning</span>
+                            </a>
+                        {% else %}
+                            <p>No chapters completed yet.</p>
+                            <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
+                                <i data-acorn-icon="chevron-right"></i>
+                                <span>Enroll</span>
+                            </a>
+                        {% endif %}
                     {% else %}
-                        <p>No chapters completed yet.</p>
+                        <!-- User is not enrolled -->
                         <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
                             <i data-acorn-icon="chevron-right"></i>
                             <span>Enroll</span>
                         </a>
                     {% endif %}
                 {% else %}
-                    <!-- User is not enrolled -->
+                    <!-- User is not authenticated -->
                     <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
                         <i data-acorn-icon="chevron-right"></i>
                         <span>Enroll</span>
                     </a>
                 {% endif %}
-            {% else %}
-                <!-- User is not authenticated -->
-                <a href="{% url 'accounts:enroll_course' course.id %}" class="btn btn-primary btn-icon btn-icon-start w-100 w-sm-auto">
-                    <i data-acorn-icon="chevron-right"></i>
-                    <span>Enroll</span>
-                </a>
-            {% endif %}
-            
-
-
+            </div>
         </div>
         <!-- Title and Top Buttons End -->
 
         <!-- Content Start -->
-
         <div class="row">
             <!-- Left Side Start -->
             <div class="col-12 col-xxl-8 mb-5">
@@ -206,10 +203,10 @@
                             <div class="col ps-3">
                                 <div class="row g-0">
                                     <div class="col">
-                                        <div class="sh-4 d-flex align-items-center lh-1-25">Students</div>
+                                        <div class="sh-4 d-flex align-items-center lh-1-25">Category</div>
                                     </div>
                                     <div class="col-auto">
-                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.enrolled_users.count }} Enrolled</div>
+                                        <div class="sh-4 d-flex align-items-center text-alternate">{{ course.category }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -217,23 +214,6 @@
                     </div>
                 </div>
                 <!-- At a Glance End -->
-
-                <!-- Instructor Start -->
-                <h2 class="small-title">Instructor</h2>
-                <div class="card mb-5">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="sw-5 d-inline-block position-relative me-3">
-                                <img src="img/profile/profile-1.webp" class="img-fluid rounded-xl" alt="thumb" />
-                            </div>
-                            <div class="d-inline-block">
-                                <div class="h5 mb-0">{{ course.instructor }}</div>
-                                <div class="text-muted">{{ course.instructor.bio }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Instructor End -->
             </div>
             <!-- Right Side End -->
         </div>
